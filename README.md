@@ -347,3 +347,15 @@ String matching, text length from 10,000 to 100,000. The operation count is the 
 **Kasai.** The number of comparisons is linear: about `2n` on random strings and exactly `n - 1` on strings with one repeated letter. The repetitive string has large LCP values, but Kasai still does not compare from the start each time. This is the expected result of reusing `h - 1`. The time ratio from 1,000 to 10,000 characters is close to 10 for the repetitive strings and about 5 for the random strings. The measured times are only microseconds, so timer precision and fixed costs such as array allocation have a larger effect. The operation counts are the stronger evidence for linear growth.
 
 **Limitations.** Results come from one machine. Very small times are less reliable than larger times. Each experiment repeats the same input 5 times, so the results do not show the variation between different random inputs.
+
+## 8. Conclusion
+
+The experiments confirm the theoretical analysis. The operation counts agree with the expected formulas, and the measured times show the same general trends, with some noise for very small times.
+
+The main trade-offs are:
+
+- **LCS and Edit Distance** give exact results for different questions, but they need Θ(nm) time and space with a full table. They are practical for strings of moderate length, and they become expensive in memory for very long strings.
+- **Naive matching** is the simplest algorithm and needs no extra memory. It is fast on random text, but it degrades to Θ(nm) on repetitive input.
+- **KMP** guarantees Θ(n + m) time and needs Θ(m) extra space. It was the only matcher that stayed fast in all scenarios, so it is the safest choice when the input is not known in advance.
+- **Rabin-Karp** avoids most character comparisons when matches are rare, but hashing has a higher constant cost and its worst case is Θ(nm). It was slower than Naive and KMP on random text with one pattern. Its rolling hash idea is more useful in other tasks, such as searching for many patterns of the same length.
+- **Kasai's algorithm** builds the LCP array in linear time with Θ(n) extra space, but it needs a suffix array first, so the total cost also depends on how the suffix array is built.
