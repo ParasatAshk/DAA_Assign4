@@ -101,3 +101,17 @@ Manual example for `banana`:
 | 3 | 0 | banana | 0 |
 | 4 | 4 | na | 0 |
 | 5 | 2 | nana | 2 (na) |
+
+## 2. Implementation Decisions and Assumptions
+
+- **Empty pattern.** All three matchers return an empty list for an empty pattern. An empty pattern does not describe a meaningful text occurrence, so the project reports no occurrences.
+- **Pattern longer than the text.** All three matchers return an empty list.
+- **Overlapping occurrences.** All occurrences are reported, including overlapping ones. Indices are zero-based and sorted.
+- **Null input.** Inputs are assumed not to be null.
+- **DP tables.** LCS and Edit Distance use a full `(n+1) x (m+1)` table, as the assignment requires. Only the length or the distance is returned.
+- **Characters.** Characters are compared exactly, so uppercase and lowercase letters are different.
+- **Matcher interface.** The three matchers implement `StringMatcher`, so tests and experiments call them in the same way.
+- **Suffix array.** Kasai's algorithm receives the suffix array as input. `SuffixArrayBuilder` sorts the suffixes with a simple comparison. It is only a helper for tests and experiments, and its time is not measured.
+- **Library use.** All required algorithms are implemented in this project. The Java library is used only for collections, random data, sorting in the suffix array helper, files, plots, and timing.
+- **Tests.** Maven and JUnit are not used, so the project can be built with `javac` only. The tests use a small class, `TestSupport`, built on the Java standard library.
+- **Operation counters.** Algorithms receive an `OperationCounter`. It records character comparisons, DP cell updates, hash comparisons, and spurious hits.
