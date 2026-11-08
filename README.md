@@ -161,3 +161,40 @@ Result of `java -cp out tests.AllTests`:
 Passed: 85
 Failed: 0
 ```
+
+## 5. Experimental Setup, Input Sizes, and Timing Methodology
+
+**Environment.** Apple M4 CPU, 16 GB memory, macOS (Darwin 24.6.0), and OpenJDK 25.0.2. The default JVM settings were used.
+
+**Alphabet.** All generated strings use the alphabet `{a, b, c, d}`. The repetitive inputs use only `a` and `b` from the same alphabet.
+
+**Random seed.** The random generator uses the fixed seed 42. Each experiment group starts a new generator with this seed.
+
+| Experiment | Input sizes | Inputs |
+|---|---|---|
+| LCS | Two strings of length 100, 500, and 1,000 | Random strings |
+| Edit Distance | Two strings of length 100, 500, and 1,000 | The same strings as LCS |
+| String matching | Text lengths 10,000, 50,000, and 100,000 | The four scenarios below |
+| Kasai LCP | Strings of length 1,000, 5,000, and 10,000 | Random and repetitive strings |
+
+**String matching scenarios.** Naive, KMP, and Rabin-Karp use the same text and the same pattern in each comparison.
+
+| Scenario | Text | Pattern | Pattern length | Purpose |
+|---|---|---|---|---|
+| `random_present` | Random | Copy of the text from position `n/2` | 20 | Required: pattern present |
+| `random_absent` | Random | Random pattern, checked to be absent before timing | 20 | Required: pattern absent |
+| `repetitive_present` | Only `a` | Only `a` | 1,000 | Additional: worst case for Naive and Rabin-Karp |
+| `repetitive_absent` | Only `a` | `a` repeated 999 times, then `b` | 1,000 | Additional: worst case for Naive |
+
+**Timing methodology.**
+
+- Each timed experiment runs 5 times with the same input, and the average is reported. The five values are stored in the CSV files.
+- `System.nanoTime()` is called immediately before and after the algorithm call.
+- Input generation, the absent pattern check, suffix array construction, console output, and file operations are outside the timed region.
+- Before the five timed runs, each task runs for 500 ms as a JVM warm-up. These runs are not recorded. With a shorter warm-up of 10 runs, the measurements were clearly affected by JIT compilation. For example, Kasai on 10,000 characters appeared to be faster than on 1,000 characters.
+- Each result is added to a control value that is printed at the end, so the JVM cannot remove the calculation as unused code.
+- Operation counters are updated inside the timed region. This adds a small constant cost to all algorithms.
+
+**Operation counts.** These counts do not depend on the machine. For Naive and KMP, character comparisons are counted. KMP includes the comparisons from LPS preprocessing. For Rabin-Karp, hash comparisons, character comparisons in verification, and spurious hits are counted.
+
+Raw data is available in `results/dp.csv`, `results/matching.csv`, and `results/kasai.csv`.
