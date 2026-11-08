@@ -19,7 +19,7 @@ import util.OperationCounter;
 public class ExperimentRunner {
     private static final long SEED = 42L;
     private static final int RUNS = 5;
-    private static final int WARM_UP_RUNS = 10;
+    private static final long WARM_UP_NANOS = 500_000_000L;
     private static final int RANDOM_PATTERN_LENGTH = 20;
     private static final int REPETITIVE_PATTERN_LENGTH = 1000;
     private static final int[] DP_SIZES = {100, 500, 1000};
@@ -58,7 +58,8 @@ public class ExperimentRunner {
     }
 
     private static Measurement measure(Task task) {
-        for (int i = 0; i < WARM_UP_RUNS; i++) {
+        long warmUpEnd = System.nanoTime() + WARM_UP_NANOS;
+        while (System.nanoTime() < warmUpEnd) {
             sink += task.run(new OperationCounter());
         }
 
