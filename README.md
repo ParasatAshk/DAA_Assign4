@@ -198,3 +198,132 @@ Failed: 0
 **Operation counts.** These counts do not depend on the machine. For Naive and KMP, character comparisons are counted. KMP includes the comparisons from LPS preprocessing. For Rabin-Karp, hash comparisons, character comparisons in verification, and spurious hits are counted.
 
 Raw data is available in `results/dp.csv`, `results/matching.csv`, and `results/kasai.csv`.
+
+## 6. Experimental Results
+
+The times below are averages of 5 runs on the machine from Section 5. Operation counts are exact.
+
+### 6.1 LCS and Edit Distance
+
+| Algorithm | n = m | Result | Average time (ms) | Character comparisons | Cell updates |
+|---|---|---|---|---|---|
+| LCS | 100 | 64 | 0.0085 | 10,000 | 10,000 |
+| Edit Distance | 100 | 55 | 0.0084 | 10,000 | 10,000 |
+| LCS | 500 | 326 | 0.1750 | 250,000 | 250,000 |
+| Edit Distance | 500 | 267 | 0.1744 | 250,000 | 250,000 |
+| LCS | 1,000 | 648 | 0.6953 | 1,000,000 | 1,000,000 |
+| Edit Distance | 1,000 | 521 | 0.7196 | 1,000,000 | 1,000,000 |
+
+![LCS and Edit Distance execution time](results/plots/dp_time.png)
+
+### 6.2 String Matching
+
+**Random text, pattern present**
+
+| Algorithm | Text length | Pattern length | Occurrences | Average time (ms) | Character comparisons | Hash comparisons | Spurious hits |
+|---|---|---|---|---|---|---|---|
+| Naive | 10,000 | 20 | 1 | 0.0145 | 13,433 | 0 | 0 |
+| KMP | 10,000 | 20 | 1 | 0.0160 | 12,544 | 0 | 0 |
+| Rabin-Karp | 10,000 | 20 | 1 | 0.0769 | 20 | 9,981 | 0 |
+| Naive | 50,000 | 20 | 1 | 0.0899 | 66,562 | 0 | 0 |
+| KMP | 50,000 | 20 | 1 | 0.0997 | 62,413 | 0 | 0 |
+| Rabin-Karp | 50,000 | 20 | 1 | 0.3508 | 20 | 49,981 | 0 |
+| Naive | 100,000 | 20 | 1 | 0.2199 | 133,426 | 0 | 0 |
+| KMP | 100,000 | 20 | 1 | 0.2772 | 125,092 | 0 | 0 |
+| Rabin-Karp | 100,000 | 20 | 1 | 0.7091 | 20 | 99,981 | 0 |
+
+![String matching on random text with a present pattern](results/plots/matching_random_present.png)
+
+**Random text, pattern absent**
+
+| Algorithm | Text length | Pattern length | Occurrences | Average time (ms) | Character comparisons | Hash comparisons | Spurious hits |
+|---|---|---|---|---|---|---|---|
+| Naive | 10,000 | 20 | 0 | 0.0145 | 13,376 | 0 | 0 |
+| KMP | 10,000 | 20 | 0 | 0.0153 | 12,550 | 0 | 0 |
+| Rabin-Karp | 10,000 | 20 | 0 | 0.0700 | 0 | 9,981 | 0 |
+| Naive | 50,000 | 20 | 0 | 0.0786 | 66,627 | 0 | 0 |
+| KMP | 50,000 | 20 | 0 | 0.0792 | 62,432 | 0 | 0 |
+| Rabin-Karp | 50,000 | 20 | 0 | 0.3508 | 0 | 49,981 | 0 |
+| Naive | 100,000 | 20 | 0 | 0.2528 | 133,476 | 0 | 0 |
+| KMP | 100,000 | 20 | 0 | 0.2183 | 123,508 | 0 | 0 |
+| Rabin-Karp | 100,000 | 20 | 0 | 0.7104 | 0 | 99,981 | 0 |
+
+![String matching on random text with an absent pattern](results/plots/matching_random_absent.png)
+
+**Repetitive text, pattern present**
+
+| Algorithm | Text length | Pattern length | Occurrences | Average time (ms) | Character comparisons | Hash comparisons | Spurious hits |
+|---|---|---|---|---|---|---|---|
+| Naive | 10,000 | 1,000 | 9,001 | 6.9452 | 9,001,000 | 0 | 0 |
+| KMP | 10,000 | 1,000 | 9,001 | 0.0480 | 10,999 | 0 | 0 |
+| Rabin-Karp | 10,000 | 1,000 | 9,001 | 24.2509 | 9,001,000 | 9,001 | 0 |
+| Naive | 50,000 | 1,000 | 49,001 | 38.0366 | 49,001,000 | 0 | 0 |
+| KMP | 50,000 | 1,000 | 49,001 | 0.2365 | 50,999 | 0 | 0 |
+| Rabin-Karp | 50,000 | 1,000 | 49,001 | 131.8139 | 49,001,000 | 49,001 | 0 |
+| Naive | 100,000 | 1,000 | 99,001 | 76.4772 | 99,001,000 | 0 | 0 |
+| KMP | 100,000 | 1,000 | 99,001 | 0.4624 | 100,999 | 0 | 0 |
+| Rabin-Karp | 100,000 | 1,000 | 99,001 | 266.5397 | 99,001,000 | 99,001 | 0 |
+
+![String matching on repetitive text with a present pattern](results/plots/matching_repetitive_present.png)
+
+**Repetitive text, pattern absent**
+
+| Algorithm | Text length | Pattern length | Occurrences | Average time (ms) | Character comparisons | Hash comparisons | Spurious hits |
+|---|---|---|---|---|---|---|---|
+| Naive | 10,000 | 1,000 | 0 | 6.9255 | 9,001,000 | 0 | 0 |
+| KMP | 10,000 | 1,000 | 0 | 0.0294 | 20,998 | 0 | 0 |
+| Rabin-Karp | 10,000 | 1,000 | 0 | 0.0764 | 0 | 9,001 | 0 |
+| Naive | 50,000 | 1,000 | 0 | 37.7186 | 49,001,000 | 0 | 0 |
+| KMP | 50,000 | 1,000 | 0 | 0.1299 | 100,998 | 0 | 0 |
+| Rabin-Karp | 50,000 | 1,000 | 0 | 0.3549 | 0 | 49,001 | 0 |
+| Naive | 100,000 | 1,000 | 0 | 76.2607 | 99,001,000 | 0 | 0 |
+| KMP | 100,000 | 1,000 | 0 | 0.2542 | 200,998 | 0 | 0 |
+| Rabin-Karp | 100,000 | 1,000 | 0 | 0.7266 | 0 | 99,001 | 0 |
+
+![String matching on repetitive text with an absent pattern](results/plots/matching_repetitive_absent.png)
+
+### 6.3 Kasai LCP
+
+| Input type | n | Average time (ms) | Character comparisons |
+|---|---|---|---|
+| random | 1,000 | 0.0058 | 1,990 |
+| repetitive | 1,000 | 0.0022 | 999 |
+| random | 5,000 | 0.0149 | 9,991 |
+| repetitive | 5,000 | 0.0111 | 4,999 |
+| random | 10,000 | 0.0298 | 19,988 |
+| repetitive | 10,000 | 0.0214 | 9,999 |
+
+![Kasai LCP execution time](results/plots/kasai_time.png)
+
+### 6.4 Growth Ratios
+
+A growth ratio divides a value at a larger size by the value at a smaller size. It can be compared directly with the ratio predicted by theory.
+
+| Algorithm | Size change | Theoretical ratio | Time ratio | Cell update ratio |
+|---|---|---|---|---|
+| LCS | 100 to 500 | 25.0 | 20.6 | 25.0 |
+| LCS | 500 to 1,000 | 4.0 | 4.0 | 4.0 |
+| Edit Distance | 100 to 500 | 25.0 | 20.8 | 25.0 |
+| Edit Distance | 500 to 1,000 | 4.0 | 4.1 | 4.0 |
+
+String matching, text length from 10,000 to 100,000. The operation count is the sum of character and hash comparisons. For a fixed pattern length, linear growth predicts a ratio close to 10. The formula `(n - m + 1) * m` with `m = 1,000` predicts a ratio of 11.0. The number of windows `n - m + 1` also grows by 11.0 times, so the hash comparison count of Rabin-Karp has this ratio in the repetitive scenarios.
+
+| Scenario | Algorithm | Time ratio | Operation count ratio |
+|---|---|---|---|
+| random_present | Naive | 15.2 | 9.9 |
+| random_present | KMP | 17.3 | 10.0 |
+| random_present | Rabin-Karp | 9.2 | 10.0 |
+| random_absent | Naive | 17.4 | 10.0 |
+| random_absent | KMP | 14.3 | 9.8 |
+| random_absent | Rabin-Karp | 10.1 | 10.0 |
+| repetitive_present | Naive | 11.0 | 11.0 |
+| repetitive_present | KMP | 9.6 | 9.2 |
+| repetitive_present | Rabin-Karp | 11.0 | 11.0 |
+| repetitive_absent | Naive | 11.0 | 11.0 |
+| repetitive_absent | KMP | 8.6 | 9.6 |
+| repetitive_absent | Rabin-Karp | 9.5 | 11.0 |
+
+| Input type | Size change | Theoretical ratio | Time ratio | Comparison ratio |
+|---|---|---|---|---|
+| random | 1,000 to 10,000 | 10.0 | 5.1 | 10.0 |
+| repetitive | 1,000 to 10,000 | 10.0 | 9.7 | 10.0 |
