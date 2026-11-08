@@ -327,3 +327,23 @@ String matching, text length from 10,000 to 100,000. The operation count is the 
 |---|---|---|---|---|
 | random | 1,000 to 10,000 | 10.0 | 5.1 | 10.0 |
 | repetitive | 1,000 to 10,000 | 10.0 | 9.7 | 10.0 |
+
+## 7. Discussion: Theory and Experiments
+
+**Theory and measurement answer different questions.** Big-O and Θ bounds describe how the amount of work grows, and they ignore constant factors. Measured time is in milliseconds, so it also depends on the CPU, the JVM, memory, and the input. For this reason, operation counts are the most direct check of the theory, while time shows the practical cost.
+
+**LCS and Edit Distance.** Both algorithms fill exactly `n x m` cells, so the counts match theory exactly. When `n` doubles from 500 to 1,000, time grows by about 4 times, which agrees with Θ(nm). From 100 to 500, the ratio is about 21 instead of 25. The times for `n = 100` are only a few microseconds, so constant overhead has a larger effect there. Both algorithms take almost the same time because they do the same kind of work per cell. The plot has only three measured sizes joined by straight lines, so it does not show the smooth quadratic curve.
+
+**Random text.** Naive made about 1.33 character comparisons per text position. With four letters, a comparison succeeds with probability 1/4, so the expected number per position is about `1 / (1 - 1/4) = 1.33`. KMP made about 1.25 comparisons per position. On this input, the worst case of Naive does not appear, and the times of Naive and KMP are very close. Rabin-Karp made almost no character comparisons, but it was about 3 to 5 times slower because each window needs modular arithmetic. So a smaller number of character comparisons does not always mean less time.
+
+**Present and absent patterns on random text.** The times are very similar, because only one occurrence exists in the present case. Rabin-Karp verified 20 characters in the present case and none in the absent case. No spurious hits happened, which agrees with the very small collision probability for `q = 1,000,000,007`.
+
+**Time growth on random text.** The comparison counts grow by about 10 times from 10,000 to 100,000 characters, as theory predicts. The measured time of Naive and KMP grew by about 14 to 17 times. So their time was less linear than their counts. These times are very short and vary between runs: the Naive average at 100,000 characters was about 0.20 ms in one complete execution and 0.25 ms in the next. A likely reason for the extra growth is that the CPU predicts branches better on a short text that is repeated many times. This reason was not tested in this project.
+
+**Repetitive text.** This input shows the difference between the algorithms. For `repetitive_absent`, Naive made 99,001,000 comparisons at `n = 100,000`, which is exactly `(n - m + 1) * m`. KMP made 200,998, which is about `2n`, and it was about 300 times faster. Rabin-Karp made no character comparisons because no window hash matched the pattern hash.
+
+**Worst case of Rabin-Karp.** In `repetitive_present`, every window is a real occurrence and needs full verification. Rabin-Karp made the same 99,001,000 comparisons as Naive, so the Θ(nm) worst case is clearly visible. The time ratio from 10,000 to 100,000 characters is about 11 for both algorithms, as the formula `(n - m + 1) * m` predicts. KMP made only 100,999 comparisons and took less than 1 ms. Rabin-Karp was about 3.5 times slower than Naive with the same number of comparisons. The hash work is too small to explain this difference, because it takes under 1 ms at this size. A likely reason is that the JVM optimizes the loop in Naive better than the separate verification method. This reason was not tested in this project.
+
+**Kasai.** The number of comparisons is linear: about `2n` on random strings and exactly `n - 1` on strings with one repeated letter. The repetitive string has large LCP values, but Kasai still does not compare from the start each time. This is the expected result of reusing `h - 1`. The time ratio from 1,000 to 10,000 characters is close to 10 for the repetitive strings and about 5 for the random strings. The measured times are only microseconds, so timer precision and fixed costs such as array allocation have a larger effect. The operation counts are the stronger evidence for linear growth.
+
+**Limitations.** Results come from one machine. Very small times are less reliable than larger times. Each experiment repeats the same input 5 times, so the results do not show the variation between different random inputs.
