@@ -142,3 +142,22 @@ The bounds for the matchers apply when `1 <= m <= n`. If `m = 0` or `m > n`, all
 **Expected and worst-case bounds of Rabin-Karp.** Rabin-Karp is the only required algorithm with different expected and worst-case bounds. With a good hash and a large modulus, a spurious hit has a probability of about `1/q` for each window. Then the character checks happen almost only at real occurrences, and the expected time is Θ(n + m + mk). When there are few occurrences, this is about Θ(n + m). The worst case is Θ(nm). It happens when most windows need full verification, for example when the text and the pattern contain only one repeated letter, or when many collisions happen.
 
 **Space reduction.** LCS and Edit Distance could use `O(min(n, m))` space if only the last row is kept. The full table is used here because the assignment asks for a dynamic programming table.
+
+## 4. Testing Strategy and Results
+
+The tests are in `test/tests`. Each check compares an actual result with an expected result that was prepared by hand. Every string matching case runs Naive, KMP, and Rabin-Karp. Each matcher is compared with the expected list, and one more check confirms that all three lists are the same.
+
+| Area | Test cases | Checks |
+|---|---|---|
+| LCS | Identical strings, completely different strings, first, second, and both strings empty, textbook example, non-contiguous subsequence, number of filled cells | 8 |
+| Edit Distance | Identical strings, source empty, target empty, both empty, substitution only, insertion only, deletion only, mixed operations (`kitten` to `sitting`), symmetry, number of filled cells | 10 |
+| String matching | Pattern at the beginning, middle, and end; multiple and overlapping occurrences; pattern absent; pattern longer than the text; empty pattern; empty text; empty text and pattern; pattern equal to the text; single character. Each case has four checks. | 52 |
+| KMP and Rabin-Karp details | Known LPS table, correct answer under forced hash collisions, spurious hits really occur, agreement on 500 random inputs | 4 |
+| Kasai LCP | `banana`, `abracadabra`, `aaaa`, one character, and an empty string, with manually verified suffix and LCP arrays. Comparison with direct LCP computation on 200 random strings. | 11 |
+
+Result of `java -cp out tests.AllTests`:
+
+```text
+Passed: 85
+Failed: 0
+```
