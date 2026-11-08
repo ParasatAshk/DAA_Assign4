@@ -6,6 +6,7 @@ public class AllTests {
         LongestCommonSubsequenceTest.run();
         EditDistanceTest.run();
         StringMatchingTest.run();
+        KasaiLcpTest.run();
 
         System.out.println();
         System.out.println("Passed: " + TestSupport.passedCount());
