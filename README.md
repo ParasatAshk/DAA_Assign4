@@ -6,6 +6,7 @@ This repository contains a Java application for text analysis. It implements two
 
 | Path | Content |
 |---|---|
+| `README.md` | Full report |
 | `src/dp` | LCS and Edit Distance |
 | `src/matching` | Matcher interface, Naive, KMP, and Rabin-Karp |
 | `src/suffix` | Kasai LCP algorithm and a simple suffix array builder |
