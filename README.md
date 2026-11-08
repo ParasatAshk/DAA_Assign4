@@ -115,3 +115,30 @@ Manual example for `banana`:
 - **Library use.** All required algorithms are implemented in this project. The Java library is used only for collections, random data, sorting in the suffix array helper, files, plots, and timing.
 - **Tests.** Maven and JUnit are not used, so the project can be built with `javac` only. The tests use a small class, `TestSupport`, built on the Java standard library.
 - **Operation counters.** Algorithms receive an `OperationCounter`. It records character comparisons, DP cell updates, hash comparisons, and spurious hits.
+
+## 3. Complexity Analysis
+
+These are theoretical results. Measured execution times are given separately in Section 6. Here, `k` is the number of reported occurrences. The result list needs `O(k)` extra space, and it is not included in the auxiliary space column.
+
+The bounds for the matchers apply when `1 <= m <= n`. If `m = 0` or `m > n`, all matchers return immediately in `O(1)` time.
+
+| Algorithm | Main operation or recurrence | Best-case time | Worst-case time | Auxiliary space | Justification |
+|---|---|---|---|---|---|
+| LCS | `L[i][j] = L[i-1][j-1] + 1` if the characters match, otherwise `max(L[i-1][j], L[i][j-1])` | Θ(nm) | Θ(nm) | Θ(nm) | The two loops fill all `n x m` cells for every input. Each cell needs constant work. The table has `(n+1)(m+1)` cells. |
+| Edit Distance | `D[i][j] = D[i-1][j-1]` if the characters match, otherwise `1 + min(D[i-1][j], D[i][j-1], D[i-1][j-1])` | Θ(nm) | Θ(nm) | Θ(nm) | The structure is the same as in LCS, with constant work for each of the `n x m` cells. |
+| Naive matching | Compare the pattern with the text at each start position. No preprocessing. | Θ(n-m+1) | Θ((n-m+1)m), which is O(nm) | Θ(1) | Best case: every position stops after one comparison, so there are `n-m+1` comparisons. Worst case: each of the `n-m+1` positions needs all `m` comparisons. |
+| KMP | Build `lps`, then move `i` forward and shift `j` with `j = lps[j-1]`. | Θ(n + m) | Θ(n + m) | Θ(m) | Preprocessing is Θ(m). In the search, `i` never decreases and `j` can decrease only as much as it has increased. So the search makes at most `2n` comparisons. |
+| Rabin-Karp | Compare hashes, roll the hash, and verify characters when hashes are equal. | Θ(n + m) | Θ(nm) | Θ(1) | Preprocessing is Θ(m), and rolling the hash is Θ(1) per window. Each verification costs up to `m`. The expected time is Θ(n + m + mk) with a good hash. The worst case happens if most windows need verification. |
+| Kasai LCP | Compute `rank`, then extend the common length `h`, and reduce it by at most 1 for the next suffix. | Θ(n) | Θ(n) | Θ(n) | `h` never exceeds `n`. It is reduced at most once per suffix and reset only for the first-ranked suffix, so the number of successful comparisons is `O(n)`. Each suffix has at most one failed comparison. The `rank` array needs `n` cells. |
+
+**Preprocessing and search.**
+
+| Algorithm | Preprocessing | Search (best) | Search (worst) |
+|---|---|---|---|
+| Naive | None | Θ(n-m+1) | Θ((n-m+1)m) |
+| KMP | Θ(m) | Θ(n) | Θ(n) |
+| Rabin-Karp | Θ(m) | Θ(n) | Θ(nm) |
+
+**Expected and worst-case bounds of Rabin-Karp.** Rabin-Karp is the only required algorithm with different expected and worst-case bounds. With a good hash and a large modulus, a spurious hit has a probability of about `1/q` for each window. Then the character checks happen almost only at real occurrences, and the expected time is Θ(n + m + mk). When there are few occurrences, this is about Θ(n + m). The worst case is Θ(nm). It happens when most windows need full verification, for example when the text and the pattern contain only one repeated letter, or when many collisions happen.
+
+**Space reduction.** LCS and Edit Distance could use `O(min(n, m))` space if only the last row is kept. The full table is used here because the assignment asks for a dynamic programming table.
