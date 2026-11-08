@@ -5,6 +5,7 @@ public class AllTests {
     public static void main(String[] args) {
         LongestCommonSubsequenceTest.run();
         EditDistanceTest.run();
+        StringMatchingTest.run();
 
         System.out.println();
         System.out.println("Passed: " + TestSupport.passedCount());
